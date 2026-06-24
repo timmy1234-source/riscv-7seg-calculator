@@ -41,7 +41,7 @@
 * <img width="777" height="260" alt="image" src="https://github.com/user-attachments/assets/80b33dd5-6c67-4b78-91ba-5fbce79b97d5" />
 
 * **接著點擊"Eclipse.bat"他就會自動開啟**
-* 這時要注意Eclipse的設定是否正確如下
+* 這時要注意Eclipse的設定是否正確如下方PDF
 * [Setup_Debug_Configuration.pdf](https://github.com/user-attachments/files/29289072/Setup_Debug_Configuration.pdf)
 
 
