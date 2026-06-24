@@ -45,6 +45,8 @@
 * **這時要注意Eclipse的設定是否正確如PDF**
   [Setup_Debug_Configuration.pdf](https://github.com/user-attachments/files/29289072/Setup_Debug_Configuration.pdf)
 
+
+---
 ## 4. VIVADO 燒入步驟
 * **開啟Hardware Manager 點選Auto Connect**
   
@@ -54,7 +56,9 @@
   
   <img width="507" height="307" alt="image" src="https://github.com/user-attachments/assets/874c2772-a17a-4a7b-9c0a-4e35b4e4333f" />
 
-## 5.Eclipse IDE使用。	
+
+---
+## 5. Eclipse IDE使用。	
 * **搭配前面的工作環境，他其實可以做到只要修改main.c他都能幫你一鍵編譯成RISC-V需要的檔案**
 * **點選左上槌子圖示就會自動編譯**
 * **Console 會顯示是否有error。以及是否編譯成功。**
@@ -66,6 +70,20 @@
 * **這時檔案就已經完整編寫進basys3裡面了。**
   
   <img width="450" height="209" alt="image" src="https://github.com/user-attachments/assets/510d4897-abda-49a5-929c-5eb7ccc0f9b9" />
+
+---
+## 6. Basys3操作
+
+<img width="677" height="427" alt="image" src="https://github.com/user-attachments/assets/5ba050d9-77d0-442d-88d1-2d3a70ba39f7" />
+**1)	7段顯示器(紅色框):用來顯示A、B、A+B、A-B的數值。**
+**2)	按鈕(黃色框):總共5顆，只有上、中、左、右有功能。**
+**功能如下:**
+* 上:控制A的數值，按一次數值加1。當按按鈕   時7段顯示器自動切換至A數值。
+* 中: 控制B的數值，按一次數值加1。當按按鈕時7段顯示器自動切換至B數值。
+* 左:用於切換加法、減法模式。按下會同步切換即顯示計算結果。
+* 右:把A、B的值歸零。
+
+  
 
 
 
