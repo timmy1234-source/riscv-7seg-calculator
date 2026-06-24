@@ -41,7 +41,8 @@
 **如下圖 將內容修改為電腦中tool資料夾各個內容的相對位置**
   <img width="777" height="260" alt="image" src="https://github.com/user-attachments/assets/80b33dd5-6c67-4b78-91ba-5fbce79b97d5" />
 
-* **接著點擊"Eclipse.bat"他就會自動開啟**
+* **接著點擊修改後的"Eclipse.bat"**
+* **點擊後Eclipse會自動開啟**
 * **這時要注意Eclipse的設定是否正確如PDF**
   [Setup_Debug_Configuration.pdf](https://github.com/user-attachments/files/29289072/Setup_Debug_Configuration.pdf)
 
@@ -80,7 +81,7 @@
 * **按鈕(黃色框):總共5顆，只有上、中、左、右有功能。**
   
 **功能如下:**
-* 上:控制A的數值，按一次數值加1。當按按鈕   時7段顯示器自動切換至A數值。
+* 上:控制A的數值，按一次數值加1。當按按鈕時7段顯示器自動切換至A數值。
 * 中: 控制B的數值，按一次數值加1。當按按鈕時7段顯示器自動切換至B數值。
 * 左:用於切換加法、減法模式。按下會同步切換即顯示計算結果。
 * 右:把A、B的值歸零。
