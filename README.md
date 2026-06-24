@@ -62,8 +62,8 @@
   <img width="507" height="360" alt="image" src="https://github.com/user-attachments/assets/634a34eb-10c7-41a6-bbea-12c697d32013" />
 
 * **點選debug圖式。將編好的檔案編進板子裡跑。**
-**開始為暫停狀態，點擊resume讓他繼續跑就好。**
-**這時檔案就已經完整編寫進basys3裡面了。**
+* **開始為暫停狀態，點擊resume讓他繼續跑就好。**
+* **這時檔案就已經完整編寫進basys3裡面了。**
   
 <img width="450" height="209" alt="image" src="https://github.com/user-attachments/assets/25807392-5dac-44f4-b5dc-a544d9fef96c" />
 
