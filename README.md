@@ -75,7 +75,7 @@
 ---
 ## 6. Basys3操作
 
-<img width="447" height="270" alt="image" src="https://github.com/user-attachments/assets/b0808f93-8c2c-4ed7-9173-0a65d2acf64c" />
+  <img width="447" height="270" alt="image" src="https://github.com/user-attachments/assets/b0808f93-8c2c-4ed7-9173-0a65d2acf64c" />
 
 * **7段顯示器(紅色框):用來顯示A、B、A+B、A-B的數值。**
 * **按鈕(黃色框):總共5顆，只有上、中、左、右有功能。**
