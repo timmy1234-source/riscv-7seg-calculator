@@ -46,9 +46,11 @@
 
 ## 4. VIVADO 燒入步驟
 **1)	開啟Hardware Manager 點選Auto Connect**
+
   <img width="507" height="309" alt="image" src="https://github.com/user-attachments/assets/e6f30003-12ec-4b66-b6ed-4699a4d2c693" />
 
 **2)	點選program device 燒入 bit**
+
   <img width="507" height="307" alt="image" src="https://github.com/user-attachments/assets/874c2772-a17a-4a7b-9c0a-4e35b4e4333f" />
 
  
