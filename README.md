@@ -37,7 +37,7 @@
 * **前面工具安裝完後，會有tool資料夾將工具都放裡面**
   <img width="650" height="117" alt="image" src="https://github.com/user-attachments/assets/ef124024-b61e-48a1-9485-1a799ad7cfec" />
 
-* **接著在路徑"FGMT_RiscV-main\Software\Eclipse.bat"中我們必須修改這個檔案讓他對應到我們剛剛tool資料夾的位置**
+* **接著在路徑"Software\Eclipse.bat"中我們必須修改這個檔案讓他對應到我們剛剛tool資料夾的位置**
 **如下圖 將內容修改為電腦中tool資料夾各個內容的相對位置**
   <img width="777" height="260" alt="image" src="https://github.com/user-attachments/assets/80b33dd5-6c67-4b78-91ba-5fbce79b97d5" />
 
