@@ -9,7 +9,7 @@
 ## 1. 使用開發板
 
 * **核心平台**：Digilent Basys 3 FPGA 開發板
-* **核心晶片**：Xilinx Artix-7 FPGA (型號：`XC7A35T-1CPG236C`)
+* **核心晶片**：Xilinx Artix-7 FPGA 
 * **硬體周邊應用**：
   * 板載 4 位數共陰極七段顯示器（用於顯示運算結果與狀態碼）
   * 滑動開關 (Switches) 與實體按鍵 (Push Buttons)（用於資料輸入與功能控制）
