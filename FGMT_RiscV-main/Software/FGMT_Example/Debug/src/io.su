@@ -1,0 +1,8 @@
+src/io.c:21:6:out32	32	static
+src/io.c:25:10:in32	32	static
+src/io.c:29:10:bit_of	32	static
+src/io.c:33:10:read_bit	48	static
+src/io.c:38:6:set_bit	48	static
+src/io.c:43:10:read_bitfield	48	static
+src/io.c:48:6:clear_bit	48	static
+src/io.c:53:6:write_bitfield	48	static

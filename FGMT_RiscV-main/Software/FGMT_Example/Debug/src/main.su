@@ -1,0 +1,4 @@
+src/main.c:6:6:delay	32	static
+src/main.c:9:6:split_digits	48	static
+src/main.c:17:14:get_seg_code	80	static
+src/main.c:23:5:main	64	static

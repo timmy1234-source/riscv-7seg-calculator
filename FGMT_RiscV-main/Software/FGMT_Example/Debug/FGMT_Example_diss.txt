@@ -1,0 +1,902 @@
+
+Debug/FGMT_Example.elf:     file format elf32-littleriscv
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .vector_table 00000014  00002000  00002000  00001000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .text         00000964  00002014  00002014  00001014  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .data         00000000  00004000  00002978  00002000  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .bss          0000001c  00004000  00002978  00002000  2**2
+                  ALLOC
+SYMBOL TABLE:
+00002000 l    d  .vector_table	00000000 .vector_table
+00002014 l    d  .text	00000000 .text
+00004000 l    d  .data	00000000 .data
+00004000 l    d  .bss	00000000 .bss
+00002010 l       .vector_table	00000000 the_end
+00002978 g       .data	00000000 _sidata
+00004000 g       .bss	00000000 _sbss
+000025cc g     F .text	00000028 in32
+0000204c g     F .text	000000b0 split_digits
+00002678 g     F .text	0000004c set_bit
+000028d4 g     F .text	0000007c memcpy
+00002000 g     F .vector_table	00000000 entrypoint
+000023dc g     F .text	000001c0 riscv_Launch
+000026c4 g     F .text	00000048 read_bitfield
+00004000 g       .data	00000000 _sdata
+000020fc g     F .text	000000a8 get_seg_code
+0000401c g       .bss	00000000 _ebss
+000027cc g     F .text	0000009c premain
+00002628 g     F .text	00000050 read_bit
+0000275c g     F .text	00000070 write_bitfield
+000025f4 g     F .text	00000034 bit_of
+0000259c g     F .text	00000030 out32
+00002868 g     F .text	0000006c memset
+00004000 g     O .bss	0000001c startup_code
+000021a4 g     F .text	00000238 main
+00002014 g     F .text	00000038 delay
+0000270c g     F .text	00000050 clear_bit
+00004000 g       .data	00000000 _edata
+
+
+
+Disassembly of section .vector_table:
+
+00002000 <entrypoint>:
+// entry point at startup
+.global entrypoint
+.type entrypoint,@function
+entrypoint:
+    // Load the initial stack pointer value.
+    la   sp, _sp
+    2000:	00003117          	auipc	sp,0x3
+    2004:	00010113          	mv	sp,sp
+    // Call 'premain()'
+    call premain
+    2008:	00000097          	auipc	ra,0x0
+    200c:	7c4080e7          	jalr	1988(ra) # 27cc <premain>
+
+00002010 <the_end>:
+    // .data/.bss sections initialized there
+    // At the end main is called
+
+    // endless loop after unexpected premain return
+the_end:
+    j the_end
+    2010:	0000006f          	j	2010 <the_end>
+
+Disassembly of section .text:
+
+00002014 <delay>:
+#include <stdint.h>
+#include "io.h"
+
+#define GPIO_BASE 0xfffffec0
+
+void delay(int count) { while(count--); }
+    2014:	fe010113          	addi	sp,sp,-32 # 4fe0 <_ebss+0xfc4>
+    2018:	00812e23          	sw	s0,28(sp)
+    201c:	02010413          	addi	s0,sp,32
+    2020:	fea42623          	sw	a0,-20(s0)
+    2024:	00000013          	nop
+    2028:	fec42783          	lw	a5,-20(s0)
+    202c:	fff78713          	addi	a4,a5,-1
+    2030:	fee42623          	sw	a4,-20(s0)
+    2034:	fe079ae3          	bnez	a5,2028 <delay+0x14>
+    2038:	00000013          	nop
+    203c:	00000013          	nop
+    2040:	01c12403          	lw	s0,28(sp)
+    2044:	02010113          	addi	sp,sp,32
+    2048:	00008067          	ret
+
+0000204c <split_digits>:
+
+// 移除除法，純減法拆解數字
+void split_digits(int val, int *d0, int *d1, int *is_neg) {
+    204c:	fd010113          	addi	sp,sp,-48
+    2050:	02812623          	sw	s0,44(sp)
+    2054:	03010413          	addi	s0,sp,48
+    2058:	fca42e23          	sw	a0,-36(s0)
+    205c:	fcb42c23          	sw	a1,-40(s0)
+    2060:	fcc42a23          	sw	a2,-44(s0)
+    2064:	fcd42823          	sw	a3,-48(s0)
+    if (val < 0) { *is_neg = 1; val = -val; } else { *is_neg = 0; }
+    2068:	fdc42783          	lw	a5,-36(s0)
+    206c:	0207d063          	bgez	a5,208c <split_digits+0x40>
+    2070:	fd042783          	lw	a5,-48(s0)
+    2074:	00100713          	li	a4,1
+    2078:	00e7a023          	sw	a4,0(a5)
+    207c:	fdc42783          	lw	a5,-36(s0)
+    2080:	40f007b3          	neg	a5,a5
+    2084:	fcf42e23          	sw	a5,-36(s0)
+    2088:	00c0006f          	j	2094 <split_digits+0x48>
+    208c:	fd042783          	lw	a5,-48(s0)
+    2090:	0007a023          	sw	zero,0(a5)
+    int temp = (val > 99) ? 99 : val;
+    2094:	fdc42783          	lw	a5,-36(s0)
+    2098:	06300713          	li	a4,99
+    209c:	00f75463          	bge	a4,a5,20a4 <split_digits+0x58>
+    20a0:	06300793          	li	a5,99
+    20a4:	fef42623          	sw	a5,-20(s0)
+    *d1 = 0;
+    20a8:	fd442783          	lw	a5,-44(s0)
+    20ac:	0007a023          	sw	zero,0(a5)
+    while (temp >= 10) { temp -= 10; *d1 += 1; }
+    20b0:	0240006f          	j	20d4 <split_digits+0x88>
+    20b4:	fec42783          	lw	a5,-20(s0)
+    20b8:	ff678793          	addi	a5,a5,-10
+    20bc:	fef42623          	sw	a5,-20(s0)
+    20c0:	fd442783          	lw	a5,-44(s0)
+    20c4:	0007a783          	lw	a5,0(a5)
+    20c8:	00178713          	addi	a4,a5,1
+    20cc:	fd442783          	lw	a5,-44(s0)
+    20d0:	00e7a023          	sw	a4,0(a5)
+    20d4:	fec42703          	lw	a4,-20(s0)
+    20d8:	00900793          	li	a5,9
+    20dc:	fce7cce3          	blt	a5,a4,20b4 <split_digits+0x68>
+    *d0 = temp;
+    20e0:	fd842783          	lw	a5,-40(s0)
+    20e4:	fec42703          	lw	a4,-20(s0)
+    20e8:	00e7a023          	sw	a4,0(a5)
+}
+    20ec:	00000013          	nop
+    20f0:	02c12403          	lw	s0,44(sp)
+    20f4:	03010113          	addi	sp,sp,48
+    20f8:	00008067          	ret
+
+000020fc <get_seg_code>:
+
+unsigned int get_seg_code(int val) {
+    20fc:	fb010113          	addi	sp,sp,-80
+    2100:	04812623          	sw	s0,76(sp)
+    2104:	05010413          	addi	s0,sp,80
+    2108:	faa42e23          	sw	a0,-68(s0)
+    unsigned int codes[] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
+    210c:	000037b7          	lui	a5,0x3
+    2110:	95078793          	addi	a5,a5,-1712 # 2950 <memcpy+0x7c>
+    2114:	0007ae03          	lw	t3,0(a5)
+    2118:	0047a303          	lw	t1,4(a5)
+    211c:	0087a883          	lw	a7,8(a5)
+    2120:	00c7a803          	lw	a6,12(a5)
+    2124:	0107a503          	lw	a0,16(a5)
+    2128:	0147a583          	lw	a1,20(a5)
+    212c:	0187a603          	lw	a2,24(a5)
+    2130:	01c7a683          	lw	a3,28(a5)
+    2134:	0207a703          	lw	a4,32(a5)
+    2138:	0247a783          	lw	a5,36(a5)
+    213c:	fdc42423          	sw	t3,-56(s0)
+    2140:	fc642623          	sw	t1,-52(s0)
+    2144:	fd142823          	sw	a7,-48(s0)
+    2148:	fd042a23          	sw	a6,-44(s0)
+    214c:	fca42c23          	sw	a0,-40(s0)
+    2150:	fcb42e23          	sw	a1,-36(s0)
+    2154:	fec42023          	sw	a2,-32(s0)
+    2158:	fed42223          	sw	a3,-28(s0)
+    215c:	fee42423          	sw	a4,-24(s0)
+    2160:	fef42623          	sw	a5,-20(s0)
+    if (val >= 0 && val <= 9) return codes[val];
+    2164:	fbc42783          	lw	a5,-68(s0)
+    2168:	0207c463          	bltz	a5,2190 <get_seg_code+0x94>
+    216c:	fbc42703          	lw	a4,-68(s0)
+    2170:	00900793          	li	a5,9
+    2174:	00e7ce63          	blt	a5,a4,2190 <get_seg_code+0x94>
+    2178:	fbc42783          	lw	a5,-68(s0)
+    217c:	00279793          	slli	a5,a5,0x2
+    2180:	ff078793          	addi	a5,a5,-16
+    2184:	008787b3          	add	a5,a5,s0
+    2188:	fd87a783          	lw	a5,-40(a5)
+    218c:	0080006f          	j	2194 <get_seg_code+0x98>
+    return 0x0;
+    2190:	00000793          	li	a5,0
+}
+    2194:	00078513          	mv	a0,a5
+    2198:	04c12403          	lw	s0,76(sp)
+    219c:	05010113          	addi	sp,sp,80
+    21a0:	00008067          	ret
+
+000021a4 <main>:
+
+int main(void) {
+    21a4:	fc010113          	addi	sp,sp,-64
+    21a8:	02112e23          	sw	ra,60(sp)
+    21ac:	02812c23          	sw	s0,56(sp)
+    21b0:	04010413          	addi	s0,sp,64
+    out32(GPIO_BASE + 0x08, 0x001FFFF0);
+    21b4:	002007b7          	lui	a5,0x200
+    21b8:	ff078593          	addi	a1,a5,-16 # 1ffff0 <_sp+0x1faff0>
+    21bc:	ec800513          	li	a0,-312
+    21c0:	00000097          	auipc	ra,0x0
+    21c4:	3dc080e7          	jalr	988(ra) # 259c <out32>
+
+    int A = 0, B = 0, op = 0;
+    21c8:	fe042623          	sw	zero,-20(s0)
+    21cc:	fe042423          	sw	zero,-24(s0)
+    21d0:	fe042223          	sw	zero,-28(s0)
+    int display_mode = 3;
+    21d4:	00300793          	li	a5,3
+    21d8:	fef42023          	sw	a5,-32(s0)
+
+    while (1) {
+        unsigned int btn = in32(GPIO_BASE + 0x00) & 0x1F;
+    21dc:	ec000513          	li	a0,-320
+    21e0:	00000097          	auipc	ra,0x0
+    21e4:	3ec080e7          	jalr	1004(ra) # 25cc <in32>
+    21e8:	00050793          	mv	a5,a0
+    21ec:	01f7f793          	andi	a5,a5,31
+    21f0:	fcf42e23          	sw	a5,-36(s0)
+
+        // --- 功能按鈕區 ---
+        if (btn & 0x01) { display_mode = 0; A++; if(A > 99) A = 99; delay(200000); }
+    21f4:	fdc42783          	lw	a5,-36(s0)
+    21f8:	0017f793          	andi	a5,a5,1
+    21fc:	02078c63          	beqz	a5,2234 <main+0x90>
+    2200:	fe042023          	sw	zero,-32(s0)
+    2204:	fec42783          	lw	a5,-20(s0)
+    2208:	00178793          	addi	a5,a5,1
+    220c:	fef42623          	sw	a5,-20(s0)
+    2210:	fec42703          	lw	a4,-20(s0)
+    2214:	06300793          	li	a5,99
+    2218:	00e7d663          	bge	a5,a4,2224 <main+0x80>
+    221c:	06300793          	li	a5,99
+    2220:	fef42623          	sw	a5,-20(s0)
+    2224:	000317b7          	lui	a5,0x31
+    2228:	d4078513          	addi	a0,a5,-704 # 30d40 <_sp+0x2bd40>
+    222c:	00000097          	auipc	ra,0x0
+    2230:	de8080e7          	jalr	-536(ra) # 2014 <delay>
+        if (btn & 0x02) { display_mode = 1; B++; if(B > 99) B = 99; delay(200000); }
+    2234:	fdc42783          	lw	a5,-36(s0)
+    2238:	0027f793          	andi	a5,a5,2
+    223c:	02078e63          	beqz	a5,2278 <main+0xd4>
+    2240:	00100793          	li	a5,1
+    2244:	fef42023          	sw	a5,-32(s0)
+    2248:	fe842783          	lw	a5,-24(s0)
+    224c:	00178793          	addi	a5,a5,1
+    2250:	fef42423          	sw	a5,-24(s0)
+    2254:	fe842703          	lw	a4,-24(s0)
+    2258:	06300793          	li	a5,99
+    225c:	00e7d663          	bge	a5,a4,2268 <main+0xc4>
+    2260:	06300793          	li	a5,99
+    2264:	fef42423          	sw	a5,-24(s0)
+    2268:	000317b7          	lui	a5,0x31
+    226c:	d4078513          	addi	a0,a5,-704 # 30d40 <_sp+0x2bd40>
+    2270:	00000097          	auipc	ra,0x0
+    2274:	da4080e7          	jalr	-604(ra) # 2014 <delay>
+        if (btn & 0x04) { op = !op; display_mode = 3; delay(500000); }
+    2278:	fdc42783          	lw	a5,-36(s0)
+    227c:	0047f793          	andi	a5,a5,4
+    2280:	02078663          	beqz	a5,22ac <main+0x108>
+    2284:	fe442783          	lw	a5,-28(s0)
+    2288:	0017b793          	seqz	a5,a5
+    228c:	0ff7f793          	zext.b	a5,a5
+    2290:	fef42223          	sw	a5,-28(s0)
+    2294:	00300793          	li	a5,3
+    2298:	fef42023          	sw	a5,-32(s0)
+    229c:	0007a7b7          	lui	a5,0x7a
+    22a0:	12078513          	addi	a0,a5,288 # 7a120 <_sp+0x75120>
+    22a4:	00000097          	auipc	ra,0x0
+    22a8:	d70080e7          	jalr	-656(ra) # 2014 <delay>
+
+        // 歸零鍵測試：如果你發現按 0x08 沒反應，請改為 0x10
+        if (btn & 0x08) { A = 0; B = 0; op = 0; display_mode = 3; delay(500000); }
+    22ac:	fdc42783          	lw	a5,-36(s0)
+    22b0:	0087f793          	andi	a5,a5,8
+    22b4:	02078463          	beqz	a5,22dc <main+0x138>
+    22b8:	fe042623          	sw	zero,-20(s0)
+    22bc:	fe042423          	sw	zero,-24(s0)
+    22c0:	fe042223          	sw	zero,-28(s0)
+    22c4:	00300793          	li	a5,3
+    22c8:	fef42023          	sw	a5,-32(s0)
+    22cc:	0007a7b7          	lui	a5,0x7a
+    22d0:	12078513          	addi	a0,a5,288 # 7a120 <_sp+0x75120>
+    22d4:	00000097          	auipc	ra,0x0
+    22d8:	d40080e7          	jalr	-704(ra) # 2014 <delay>
+        if (btn & 0x10) { A = 0; B = 0; op = 0; display_mode = 3; delay(500000); }
+    22dc:	fdc42783          	lw	a5,-36(s0)
+    22e0:	0107f793          	andi	a5,a5,16
+    22e4:	02078463          	beqz	a5,230c <main+0x168>
+    22e8:	fe042623          	sw	zero,-20(s0)
+    22ec:	fe042423          	sw	zero,-24(s0)
+    22f0:	fe042223          	sw	zero,-28(s0)
+    22f4:	00300793          	li	a5,3
+    22f8:	fef42023          	sw	a5,-32(s0)
+    22fc:	0007a7b7          	lui	a5,0x7a
+    2300:	12078513          	addi	a0,a5,288 # 7a120 <_sp+0x75120>
+    2304:	00000097          	auipc	ra,0x0
+    2308:	d10080e7          	jalr	-752(ra) # 2014 <delay>
+
+        // --- 顯示運算區 ---
+        int disp_val = (display_mode == 0) ? A :
+    230c:	fe042783          	lw	a5,-32(s0)
+    2310:	04078063          	beqz	a5,2350 <main+0x1ac>
+                       (display_mode == 1) ? B :
+    2314:	fe042703          	lw	a4,-32(s0)
+    2318:	00100793          	li	a5,1
+    231c:	02f70663          	beq	a4,a5,2348 <main+0x1a4>
+                       ((op == 0) ? (A + B) : (A - B));
+    2320:	fe442783          	lw	a5,-28(s0)
+    2324:	00079a63          	bnez	a5,2338 <main+0x194>
+    2328:	fec42703          	lw	a4,-20(s0)
+    232c:	fe842783          	lw	a5,-24(s0)
+    2330:	00f707b3          	add	a5,a4,a5
+    2334:	0200006f          	j	2354 <main+0x1b0>
+    2338:	fec42703          	lw	a4,-20(s0)
+    233c:	fe842783          	lw	a5,-24(s0)
+    2340:	40f707b3          	sub	a5,a4,a5
+    2344:	0100006f          	j	2354 <main+0x1b0>
+                       (display_mode == 1) ? B :
+    2348:	fe842783          	lw	a5,-24(s0)
+    234c:	0080006f          	j	2354 <main+0x1b0>
+        int disp_val = (display_mode == 0) ? A :
+    2350:	fec42783          	lw	a5,-20(s0)
+    2354:	fcf42c23          	sw	a5,-40(s0)
+
+        int d0, d1, neg;
+        split_digits(disp_val, &d0, &d1, &neg);
+    2358:	fc440693          	addi	a3,s0,-60
+    235c:	fc840713          	addi	a4,s0,-56
+    2360:	fcc40793          	addi	a5,s0,-52
+    2364:	00070613          	mv	a2,a4
+    2368:	00078593          	mv	a1,a5
+    236c:	fd842503          	lw	a0,-40(s0)
+    2370:	00000097          	auipc	ra,0x0
+    2374:	cdc080e7          	jalr	-804(ra) # 204c <split_digits>
+
+        unsigned int seg_d0 = get_seg_code(d0);
+    2378:	fcc42783          	lw	a5,-52(s0)
+    237c:	00078513          	mv	a0,a5
+    2380:	00000097          	auipc	ra,0x0
+    2384:	d7c080e7          	jalr	-644(ra) # 20fc <get_seg_code>
+    2388:	fca42a23          	sw	a0,-44(s0)
+        // 若為負數顯示 0xC
+        unsigned int seg_d1 = (neg) ? 0xC : get_seg_code(d1);
+    238c:	fc442783          	lw	a5,-60(s0)
+    2390:	00079e63          	bnez	a5,23ac <main+0x208>
+    2394:	fc842783          	lw	a5,-56(s0)
+    2398:	00078513          	mv	a0,a5
+    239c:	00000097          	auipc	ra,0x0
+    23a0:	d60080e7          	jalr	-672(ra) # 20fc <get_seg_code>
+    23a4:	00050793          	mv	a5,a0
+    23a8:	0080006f          	j	23b0 <main+0x20c>
+    23ac:	00c00793          	li	a5,12
+    23b0:	fcf42823          	sw	a5,-48(s0)
+
+        out32(GPIO_BASE + 0x04, (seg_d0 << 5) | (seg_d1 << 9));
+    23b4:	fd442783          	lw	a5,-44(s0)
+    23b8:	00579713          	slli	a4,a5,0x5
+    23bc:	fd042783          	lw	a5,-48(s0)
+    23c0:	00979793          	slli	a5,a5,0x9
+    23c4:	00f767b3          	or	a5,a4,a5
+    23c8:	00078593          	mv	a1,a5
+    23cc:	ec400513          	li	a0,-316
+    23d0:	00000097          	auipc	ra,0x0
+    23d4:	1cc080e7          	jalr	460(ra) # 259c <out32>
+    while (1) {
+    23d8:	e05ff06f          	j	21dc <main+0x38>
+
+000023dc <riscv_Launch>:
+#define JALR(rd,offset,rs1) ( 0x00000067 | (((offset)&0xfff)<<20) | ((rs1&0x1f)<<15) | ((rd&0x1f)<<7) )
+
+#define SP (2)
+
+unsigned int startup_code[7];
+void riscv_Launch(void* pc, unsigned int thread, void* stack) {
+    23dc:	fd010113          	addi	sp,sp,-48
+    23e0:	02112623          	sw	ra,44(sp)
+    23e4:	02812423          	sw	s0,40(sp)
+    23e8:	03010413          	addi	s0,sp,48
+    23ec:	fca42e23          	sw	a0,-36(s0)
+    23f0:	fcb42c23          	sw	a1,-40(s0)
+    23f4:	fcc42a23          	sw	a2,-44(s0)
+  unsigned int value; 
+  // setup stack pointer
+  value = (unsigned int) stack;
+    23f8:	fd442783          	lw	a5,-44(s0)
+    23fc:	fef42623          	sw	a5,-20(s0)
+  startup_code[0] = (0<(value&0x800)) ? LUI(SP,value+0x1000) : LUI(SP,value);
+    2400:	fec42703          	lw	a4,-20(s0)
+    2404:	000017b7          	lui	a5,0x1
+    2408:	80078793          	addi	a5,a5,-2048 # 800 <__stack_size+0x780>
+    240c:	00f777b3          	and	a5,a4,a5
+    2410:	02078063          	beqz	a5,2430 <riscv_Launch+0x54>
+    2414:	fec42703          	lw	a4,-20(s0)
+    2418:	000017b7          	lui	a5,0x1
+    241c:	00f70733          	add	a4,a4,a5
+    2420:	fffff7b7          	lui	a5,0xfffff
+    2424:	00f777b3          	and	a5,a4,a5
+    2428:	1377e793          	ori	a5,a5,311
+    242c:	0140006f          	j	2440 <riscv_Launch+0x64>
+    2430:	fec42703          	lw	a4,-20(s0)
+    2434:	fffff7b7          	lui	a5,0xfffff
+    2438:	00f777b3          	and	a5,a4,a5
+    243c:	1377e793          	ori	a5,a5,311
+    2440:	00004737          	lui	a4,0x4
+    2444:	00070713          	mv	a4,a4
+    2448:	00f72023          	sw	a5,0(a4) # 4000 <startup_code>
+  startup_code[1] = ADDI(SP,SP,value);
+    244c:	fec42783          	lw	a5,-20(s0)
+    2450:	01479713          	slli	a4,a5,0x14
+    2454:	000107b7          	lui	a5,0x10
+    2458:	11378793          	addi	a5,a5,275 # 10113 <_sp+0xb113>
+    245c:	00f76733          	or	a4,a4,a5
+    2460:	000047b7          	lui	a5,0x4
+    2464:	00078793          	mv	a5,a5
+    2468:	00e7a223          	sw	a4,4(a5) # 4004 <startup_code+0x4>
+  // load thread start address into register 1
+  value = (unsigned int) pc;
+    246c:	fdc42783          	lw	a5,-36(s0)
+    2470:	fef42623          	sw	a5,-20(s0)
+  startup_code[2] = (0<(value&0x800)) ? LUI(1,value+0x1000) : LUI(1,value);
+    2474:	fec42703          	lw	a4,-20(s0)
+    2478:	000017b7          	lui	a5,0x1
+    247c:	80078793          	addi	a5,a5,-2048 # 800 <__stack_size+0x780>
+    2480:	00f777b3          	and	a5,a4,a5
+    2484:	02078063          	beqz	a5,24a4 <riscv_Launch+0xc8>
+    2488:	fec42703          	lw	a4,-20(s0)
+    248c:	000017b7          	lui	a5,0x1
+    2490:	00f70733          	add	a4,a4,a5
+    2494:	fffff7b7          	lui	a5,0xfffff
+    2498:	00f777b3          	and	a5,a4,a5
+    249c:	0b77e793          	ori	a5,a5,183
+    24a0:	0140006f          	j	24b4 <riscv_Launch+0xd8>
+    24a4:	fec42703          	lw	a4,-20(s0)
+    24a8:	fffff7b7          	lui	a5,0xfffff
+    24ac:	00f777b3          	and	a5,a4,a5
+    24b0:	0b77e793          	ori	a5,a5,183
+    24b4:	00004737          	lui	a4,0x4
+    24b8:	00070713          	mv	a4,a4
+    24bc:	00f72423          	sw	a5,8(a4) # 4008 <startup_code+0x8>
+  startup_code[3] = ADDI(1,1,value);
+    24c0:	fec42783          	lw	a5,-20(s0)
+    24c4:	01479713          	slli	a4,a5,0x14
+    24c8:	000087b7          	lui	a5,0x8
+    24cc:	09378793          	addi	a5,a5,147 # 8093 <_sp+0x3093>
+    24d0:	00f76733          	or	a4,a4,a5
+    24d4:	000047b7          	lui	a5,0x4
+    24d8:	00078793          	mv	a5,a5
+    24dc:	00e7a623          	sw	a4,12(a5) # 400c <startup_code+0xc>
+  // Call thread
+  startup_code[4] = JALR(1,0,1);
+    24e0:	000047b7          	lui	a5,0x4
+    24e4:	00078793          	mv	a5,a5
+    24e8:	00008737          	lui	a4,0x8
+    24ec:	0e770713          	addi	a4,a4,231 # 80e7 <_sp+0x30e7>
+    24f0:	00e7a823          	sw	a4,16(a5) # 4010 <startup_code+0x10>
+  // On thread return jump to 0xfffffffc to terminate thread
+  startup_code[5] = JALR(0,0xfffffffc,0);
+    24f4:	000047b7          	lui	a5,0x4
+    24f8:	00078793          	mv	a5,a5
+    24fc:	ffc00737          	lui	a4,0xffc00
+    2500:	06770713          	addi	a4,a4,103 # ffc00067 <_sp+0xffbfb067>
+    2504:	00e7aa23          	sw	a4,20(a5) # 4014 <startup_code+0x14>
+  do {
+    out32(LAUNCHER_BASE+LAUNCHER_THREAD,0);                // Launcher mit eigener ThId belegen (Versuch)
+    2508:	00000593          	li	a1,0
+    250c:	fe400513          	li	a0,-28
+    2510:	00000097          	auipc	ra,0x0
+    2514:	08c080e7          	jalr	140(ra) # 259c <out32>
+    // Wenn Belegen erfolgreich war, dann muss Bit0 im Status-Register zu 1 gesetzt sein
+    if (1==(in32(LAUNCHER_BASE+LAUNCHER_STATUS)&1)) { break; } // Thread hat es geschafft den Launcher zu belegen
+    2518:	fe000513          	li	a0,-32
+    251c:	00000097          	auipc	ra,0x0
+    2520:	0b0080e7          	jalr	176(ra) # 25cc <in32>
+    2524:	00050793          	mv	a5,a0
+    2528:	0017f713          	andi	a4,a5,1
+    252c:	00100793          	li	a5,1
+    2530:	00f70463          	beq	a4,a5,2538 <riscv_Launch+0x15c>
+    out32(LAUNCHER_BASE+LAUNCHER_THREAD,0);                // Launcher mit eigener ThId belegen (Versuch)
+    2534:	fd5ff06f          	j	2508 <riscv_Launch+0x12c>
+    if (1==(in32(LAUNCHER_BASE+LAUNCHER_STATUS)&1)) { break; } // Thread hat es geschafft den Launcher zu belegen
+    2538:	00000013          	nop
+  } while (1);
+  // out32(LAUNCHER_BASE+LAUNCHER_PC,(unsigned int) pc);  // pc zum Launchen setzen
+  out32(LAUNCHER_BASE+LAUNCHER_PC,(unsigned int) startup_code);
+    253c:	000047b7          	lui	a5,0x4
+    2540:	00078793          	mv	a5,a5
+    2544:	00078593          	mv	a1,a5
+    2548:	fe800513          	li	a0,-24
+    254c:	00000097          	auipc	ra,0x0
+    2550:	050080e7          	jalr	80(ra) # 259c <out32>
+  out32(LAUNCHER_BASE+LAUNCHER_THNO,thread);           // thread setzen und Token launchen
+    2554:	fd842583          	lw	a1,-40(s0)
+    2558:	fec00513          	li	a0,-20
+    255c:	00000097          	auipc	ra,0x0
+    2560:	040080e7          	jalr	64(ra) # 259c <out32>
+  for (volatile int i=0; i<5; i++) { /* wait some time that the thread can launch */ }
+    2564:	fe042423          	sw	zero,-24(s0)
+    2568:	0100006f          	j	2578 <riscv_Launch+0x19c>
+    256c:	fe842783          	lw	a5,-24(s0)
+    2570:	00178793          	addi	a5,a5,1 # 4001 <startup_code+0x1>
+    2574:	fef42423          	sw	a5,-24(s0)
+    2578:	fe842703          	lw	a4,-24(s0)
+    257c:	00400793          	li	a5,4
+    2580:	fee7d6e3          	bge	a5,a4,256c <riscv_Launch+0x190>
+}
+    2584:	00000013          	nop
+    2588:	00000013          	nop
+    258c:	02c12083          	lw	ra,44(sp)
+    2590:	02812403          	lw	s0,40(sp)
+    2594:	03010113          	addi	sp,sp,48
+    2598:	00008067          	ret
+
+0000259c <out32>:
+// along with this program; if not, see http://www.gnu.org/licenses
+// or write to the Free Software Foundation,Inc., 51 Franklin Street,
+// Fifth Floor, Boston, MA 02110-1301  USA
+//---------------------------------------------------------------------------------------------
+
+void out32(unsigned addr, unsigned data) {
+    259c:	fe010113          	addi	sp,sp,-32
+    25a0:	00812e23          	sw	s0,28(sp)
+    25a4:	02010413          	addi	s0,sp,32
+    25a8:	fea42623          	sw	a0,-20(s0)
+    25ac:	feb42423          	sw	a1,-24(s0)
+	*((unsigned *) addr) = data;
+    25b0:	fec42783          	lw	a5,-20(s0)
+    25b4:	fe842703          	lw	a4,-24(s0)
+    25b8:	00e7a023          	sw	a4,0(a5)
+}
+    25bc:	00000013          	nop
+    25c0:	01c12403          	lw	s0,28(sp)
+    25c4:	02010113          	addi	sp,sp,32
+    25c8:	00008067          	ret
+
+000025cc <in32>:
+
+unsigned in32(unsigned addr) {
+    25cc:	fe010113          	addi	sp,sp,-32
+    25d0:	00812e23          	sw	s0,28(sp)
+    25d4:	02010413          	addi	s0,sp,32
+    25d8:	fea42623          	sw	a0,-20(s0)
+	return *((unsigned *) addr);
+    25dc:	fec42783          	lw	a5,-20(s0)
+    25e0:	0007a783          	lw	a5,0(a5)
+}
+    25e4:	00078513          	mv	a0,a5
+    25e8:	01c12403          	lw	s0,28(sp)
+    25ec:	02010113          	addi	sp,sp,32
+    25f0:	00008067          	ret
+
+000025f4 <bit_of>:
+
+unsigned bit_of(unsigned Wert, unsigned Bitnummer) {
+    25f4:	fe010113          	addi	sp,sp,-32
+    25f8:	00812e23          	sw	s0,28(sp)
+    25fc:	02010413          	addi	s0,sp,32
+    2600:	fea42623          	sw	a0,-20(s0)
+    2604:	feb42423          	sw	a1,-24(s0)
+     return (Wert >> Bitnummer) & 1;
+    2608:	fe842783          	lw	a5,-24(s0)
+    260c:	fec42703          	lw	a4,-20(s0)
+    2610:	00f757b3          	srl	a5,a4,a5
+    2614:	0017f793          	andi	a5,a5,1
+}
+    2618:	00078513          	mv	a0,a5
+    261c:	01c12403          	lw	s0,28(sp)
+    2620:	02010113          	addi	sp,sp,32
+    2624:	00008067          	ret
+
+00002628 <read_bit>:
+
+unsigned read_bit(unsigned Adresswert, unsigned Bitnummer) {
+    2628:	fd010113          	addi	sp,sp,-48
+    262c:	02112623          	sw	ra,44(sp)
+    2630:	02812423          	sw	s0,40(sp)
+    2634:	03010413          	addi	s0,sp,48
+    2638:	fca42e23          	sw	a0,-36(s0)
+    263c:	fcb42c23          	sw	a1,-40(s0)
+    unsigned *Adresse = (unsigned*) Adresswert;
+    2640:	fdc42783          	lw	a5,-36(s0)
+    2644:	fef42623          	sw	a5,-20(s0)
+    return bit_of(*Adresse, Bitnummer);
+    2648:	fec42783          	lw	a5,-20(s0)
+    264c:	0007a783          	lw	a5,0(a5)
+    2650:	fd842583          	lw	a1,-40(s0)
+    2654:	00078513          	mv	a0,a5
+    2658:	00000097          	auipc	ra,0x0
+    265c:	f9c080e7          	jalr	-100(ra) # 25f4 <bit_of>
+    2660:	00050793          	mv	a5,a0
+}
+    2664:	00078513          	mv	a0,a5
+    2668:	02c12083          	lw	ra,44(sp)
+    266c:	02812403          	lw	s0,40(sp)
+    2670:	03010113          	addi	sp,sp,48
+    2674:	00008067          	ret
+
+00002678 <set_bit>:
+
+void set_bit(unsigned Adresswert, unsigned Bitnummer) {
+    2678:	fd010113          	addi	sp,sp,-48
+    267c:	02812623          	sw	s0,44(sp)
+    2680:	03010413          	addi	s0,sp,48
+    2684:	fca42e23          	sw	a0,-36(s0)
+    2688:	fcb42c23          	sw	a1,-40(s0)
+    unsigned *Adresse = (unsigned *) Adresswert;
+    268c:	fdc42783          	lw	a5,-36(s0)
+    2690:	fef42623          	sw	a5,-20(s0)
+    *Adresse = *Adresse | (1 << Bitnummer);
+    2694:	fec42783          	lw	a5,-20(s0)
+    2698:	0007a783          	lw	a5,0(a5)
+    269c:	fd842703          	lw	a4,-40(s0)
+    26a0:	00100693          	li	a3,1
+    26a4:	00e69733          	sll	a4,a3,a4
+    26a8:	00e7e733          	or	a4,a5,a4
+    26ac:	fec42783          	lw	a5,-20(s0)
+    26b0:	00e7a023          	sw	a4,0(a5)
+}
+    26b4:	00000013          	nop
+    26b8:	02c12403          	lw	s0,44(sp)
+    26bc:	03010113          	addi	sp,sp,48
+    26c0:	00008067          	ret
+
+000026c4 <read_bitfield>:
+
+unsigned read_bitfield(unsigned Adresswert, unsigned Maske, unsigned Shift) {
+    26c4:	fd010113          	addi	sp,sp,-48
+    26c8:	02812623          	sw	s0,44(sp)
+    26cc:	03010413          	addi	s0,sp,48
+    26d0:	fca42e23          	sw	a0,-36(s0)
+    26d4:	fcb42c23          	sw	a1,-40(s0)
+    26d8:	fcc42a23          	sw	a2,-44(s0)
+    unsigned *Adresse = (unsigned*) Adresswert;
+    26dc:	fdc42783          	lw	a5,-36(s0)
+    26e0:	fef42623          	sw	a5,-20(s0)
+    return (*Adresse >> Shift) & Maske;
+    26e4:	fec42783          	lw	a5,-20(s0)
+    26e8:	0007a703          	lw	a4,0(a5)
+    26ec:	fd442783          	lw	a5,-44(s0)
+    26f0:	00f75733          	srl	a4,a4,a5
+    26f4:	fd842783          	lw	a5,-40(s0)
+    26f8:	00f777b3          	and	a5,a4,a5
+}
+    26fc:	00078513          	mv	a0,a5
+    2700:	02c12403          	lw	s0,44(sp)
+    2704:	03010113          	addi	sp,sp,48
+    2708:	00008067          	ret
+
+0000270c <clear_bit>:
+
+void clear_bit(unsigned Adresswert, unsigned Bitnummer) {
+    270c:	fd010113          	addi	sp,sp,-48
+    2710:	02812623          	sw	s0,44(sp)
+    2714:	03010413          	addi	s0,sp,48
+    2718:	fca42e23          	sw	a0,-36(s0)
+    271c:	fcb42c23          	sw	a1,-40(s0)
+    unsigned * Adresse = (unsigned*) Adresswert;
+    2720:	fdc42783          	lw	a5,-36(s0)
+    2724:	fef42623          	sw	a5,-20(s0)
+    *Adresse = *Adresse & ~(1 << Bitnummer);
+    2728:	fec42783          	lw	a5,-20(s0)
+    272c:	0007a783          	lw	a5,0(a5)
+    2730:	fd842703          	lw	a4,-40(s0)
+    2734:	00100693          	li	a3,1
+    2738:	00e69733          	sll	a4,a3,a4
+    273c:	fff74713          	not	a4,a4
+    2740:	00e7f733          	and	a4,a5,a4
+    2744:	fec42783          	lw	a5,-20(s0)
+    2748:	00e7a023          	sw	a4,0(a5)
+}
+    274c:	00000013          	nop
+    2750:	02c12403          	lw	s0,44(sp)
+    2754:	03010113          	addi	sp,sp,48
+    2758:	00008067          	ret
+
+0000275c <write_bitfield>:
+
+void write_bitfield(unsigned Adresswert, unsigned Wert, unsigned Maske, unsigned Shift) {
+    275c:	fd010113          	addi	sp,sp,-48
+    2760:	02812623          	sw	s0,44(sp)
+    2764:	03010413          	addi	s0,sp,48
+    2768:	fca42e23          	sw	a0,-36(s0)
+    276c:	fcb42c23          	sw	a1,-40(s0)
+    2770:	fcc42a23          	sw	a2,-44(s0)
+    2774:	fcd42823          	sw	a3,-48(s0)
+    unsigned * Adresse = (unsigned*) Adresswert;
+    2778:	fdc42783          	lw	a5,-36(s0)
+    277c:	fef42623          	sw	a5,-20(s0)
+    *Adresse = (*Adresse & ~(Maske << Shift)) | ((Wert & Maske) << Shift);
+    2780:	fec42783          	lw	a5,-20(s0)
+    2784:	0007a703          	lw	a4,0(a5)
+    2788:	fd042783          	lw	a5,-48(s0)
+    278c:	fd442683          	lw	a3,-44(s0)
+    2790:	00f697b3          	sll	a5,a3,a5
+    2794:	fff7c793          	not	a5,a5
+    2798:	00f77733          	and	a4,a4,a5
+    279c:	fd842683          	lw	a3,-40(s0)
+    27a0:	fd442783          	lw	a5,-44(s0)
+    27a4:	00f6f6b3          	and	a3,a3,a5
+    27a8:	fd042783          	lw	a5,-48(s0)
+    27ac:	00f697b3          	sll	a5,a3,a5
+    27b0:	00f76733          	or	a4,a4,a5
+    27b4:	fec42783          	lw	a5,-20(s0)
+    27b8:	00e7a023          	sw	a4,0(a5)
+}
+    27bc:	00000013          	nop
+    27c0:	02c12403          	lw	s0,44(sp)
+    27c4:	03010113          	addi	sp,sp,48
+    27c8:	00008067          	ret
+
+000027cc <premain>:
+int main();
+
+// Pre-defined memory locations for program initialization.
+extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss;
+
+void premain() {
+    27cc:	fe010113          	addi	sp,sp,-32
+    27d0:	00112e23          	sw	ra,28(sp)
+    27d4:	00812c23          	sw	s0,24(sp)
+    27d8:	02010413          	addi	s0,sp,32
+  uint8_t *src, *dst;
+
+  // Copy initialized data from .sidata (Flash) to .data (RAM)
+  src = (uint8_t *)&_sidata;
+    27dc:	000037b7          	lui	a5,0x3
+    27e0:	97878793          	addi	a5,a5,-1672 # 2978 <_sidata>
+    27e4:	fef42623          	sw	a5,-20(s0)
+  dst = (uint8_t *)&_sdata;
+    27e8:	000047b7          	lui	a5,0x4
+    27ec:	00078793          	mv	a5,a5
+    27f0:	fef42423          	sw	a5,-24(s0)
+  while (dst < (uint8_t *)&_edata)
+    27f4:	0240006f          	j	2818 <premain+0x4c>
+      *dst++ = *src++;
+    27f8:	fec42703          	lw	a4,-20(s0)
+    27fc:	00170793          	addi	a5,a4,1
+    2800:	fef42623          	sw	a5,-20(s0)
+    2804:	fe842783          	lw	a5,-24(s0)
+    2808:	00178693          	addi	a3,a5,1 # 4001 <startup_code+0x1>
+    280c:	fed42423          	sw	a3,-24(s0)
+    2810:	00074703          	lbu	a4,0(a4)
+    2814:	00e78023          	sb	a4,0(a5)
+  while (dst < (uint8_t *)&_edata)
+    2818:	fe842703          	lw	a4,-24(s0)
+    281c:	000047b7          	lui	a5,0x4
+    2820:	00078793          	mv	a5,a5
+    2824:	fcf76ae3          	bltu	a4,a5,27f8 <premain+0x2c>
+
+  // Clear the .bss RAM section.
+  dst = (uint8_t *)&_sbss;
+    2828:	000047b7          	lui	a5,0x4
+    282c:	00078793          	mv	a5,a5
+    2830:	fef42423          	sw	a5,-24(s0)
+  while (dst < (uint8_t *)&_ebss)
+    2834:	0140006f          	j	2848 <premain+0x7c>
+      *dst++ = 0;
+    2838:	fe842783          	lw	a5,-24(s0)
+    283c:	00178713          	addi	a4,a5,1 # 4001 <startup_code+0x1>
+    2840:	fee42423          	sw	a4,-24(s0)
+    2844:	00078023          	sb	zero,0(a5)
+  while (dst < (uint8_t *)&_ebss)
+    2848:	fe842703          	lw	a4,-24(s0)
+    284c:	000047b7          	lui	a5,0x4
+    2850:	01c78793          	addi	a5,a5,28 # 401c <_ebss>
+    2854:	fef762e3          	bltu	a4,a5,2838 <premain+0x6c>
+
+  main();
+    2858:	00000097          	auipc	ra,0x0
+    285c:	94c080e7          	jalr	-1716(ra) # 21a4 <main>
+  
+  while(1) {}
+    2860:	00000013          	nop
+    2864:	ffdff06f          	j	2860 <premain+0x94>
+
+00002868 <memset>:
+ */
+
+#include<stdio.h>
+#include<string.h>
+
+void *memset(void *dest, int c, size_t n) {
+    2868:	fd010113          	addi	sp,sp,-48
+    286c:	02812623          	sw	s0,44(sp)
+    2870:	03010413          	addi	s0,sp,48
+    2874:	fca42e23          	sw	a0,-36(s0)
+    2878:	fcb42c23          	sw	a1,-40(s0)
+    287c:	fcc42a23          	sw	a2,-44(s0)
+  // Typecast dest addresses to (char *)
+  char *cdest = (char *)dest;
+    2880:	fdc42783          	lw	a5,-36(s0)
+    2884:	fef42423          	sw	a5,-24(s0)
+
+  // Copy contents of src[] to dest[]
+  for (int i=0; i<n; i++) {
+    2888:	fe042623          	sw	zero,-20(s0)
+    288c:	0280006f          	j	28b4 <memset+0x4c>
+    cdest[i] = c;
+    2890:	fec42783          	lw	a5,-20(s0)
+    2894:	fe842703          	lw	a4,-24(s0)
+    2898:	00f707b3          	add	a5,a4,a5
+    289c:	fd842703          	lw	a4,-40(s0)
+    28a0:	0ff77713          	zext.b	a4,a4
+    28a4:	00e78023          	sb	a4,0(a5)
+  for (int i=0; i<n; i++) {
+    28a8:	fec42783          	lw	a5,-20(s0)
+    28ac:	00178793          	addi	a5,a5,1
+    28b0:	fef42623          	sw	a5,-20(s0)
+    28b4:	fec42783          	lw	a5,-20(s0)
+    28b8:	fd442703          	lw	a4,-44(s0)
+    28bc:	fce7eae3          	bltu	a5,a4,2890 <memset+0x28>
+  }
+  return dest;
+    28c0:	fdc42783          	lw	a5,-36(s0)
+}
+    28c4:	00078513          	mv	a0,a5
+    28c8:	02c12403          	lw	s0,44(sp)
+    28cc:	03010113          	addi	sp,sp,48
+    28d0:	00008067          	ret
+
+000028d4 <memcpy>:
+// A C implementation of memcpy()
+// see https://www.geeksforgeeks.org/write-memcpy/
+#include<stdio.h>
+#include<string.h>
+
+void *memcpy(void *dest, const void *src, size_t n) {
+    28d4:	fd010113          	addi	sp,sp,-48
+    28d8:	02812623          	sw	s0,44(sp)
+    28dc:	03010413          	addi	s0,sp,48
+    28e0:	fca42e23          	sw	a0,-36(s0)
+    28e4:	fcb42c23          	sw	a1,-40(s0)
+    28e8:	fcc42a23          	sw	a2,-44(s0)
+  // Typecast src and dest addresses to (char *)
+  char *csrc = (char *)src;
+    28ec:	fd842783          	lw	a5,-40(s0)
+    28f0:	fef42423          	sw	a5,-24(s0)
+  char *cdest = (char *)dest;
+    28f4:	fdc42783          	lw	a5,-36(s0)
+    28f8:	fef42223          	sw	a5,-28(s0)
+
+  // Copy contents of src[] to dest[]
+  for (int i=0; i<n; i++) {
+    28fc:	fe042623          	sw	zero,-20(s0)
+    2900:	0300006f          	j	2930 <memcpy+0x5c>
+    cdest[i] = csrc[i];
+    2904:	fec42783          	lw	a5,-20(s0)
+    2908:	fe842703          	lw	a4,-24(s0)
+    290c:	00f70733          	add	a4,a4,a5
+    2910:	fec42783          	lw	a5,-20(s0)
+    2914:	fe442683          	lw	a3,-28(s0)
+    2918:	00f687b3          	add	a5,a3,a5
+    291c:	00074703          	lbu	a4,0(a4)
+    2920:	00e78023          	sb	a4,0(a5)
+  for (int i=0; i<n; i++) {
+    2924:	fec42783          	lw	a5,-20(s0)
+    2928:	00178793          	addi	a5,a5,1
+    292c:	fef42623          	sw	a5,-20(s0)
+    2930:	fec42783          	lw	a5,-20(s0)
+    2934:	fd442703          	lw	a4,-44(s0)
+    2938:	fce7e6e3          	bltu	a5,a4,2904 <memcpy+0x30>
+  }
+  return dest;
+    293c:	fdc42783          	lw	a5,-36(s0)
+}
+    2940:	00078513          	mv	a0,a5
+    2944:	02c12403          	lw	s0,44(sp)
+    2948:	03010113          	addi	sp,sp,48
+    294c:	00008067          	ret
+    2950:	0000                	.2byte	0x0
+    2952:	0000                	.2byte	0x0
+    2954:	0001                	.2byte	0x1
+    2956:	0000                	.2byte	0x0
+    2958:	0002                	.2byte	0x2
+    295a:	0000                	.2byte	0x0
+    295c:	00000003          	lb	zero,0(zero) # 0 <__stack_size-0x80>
+    2960:	0004                	.2byte	0x4
+    2962:	0000                	.2byte	0x0
+    2964:	0005                	.2byte	0x5
+    2966:	0000                	.2byte	0x0
+    2968:	0006                	.2byte	0x6
+    296a:	0000                	.2byte	0x0
+    296c:	00000007          	.4byte	0x7
+    2970:	0008                	.2byte	0x8
+    2972:	0000                	.2byte	0x0
+    2974:	0009                	.2byte	0x9
+	...
+
+Disassembly of section .bss:
+
+00004000 <startup_code>:
+	...
