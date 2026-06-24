@@ -65,7 +65,8 @@
 * **開始為暫停狀態，點擊resume讓他繼續跑就好。**
 * **這時檔案就已經完整編寫進basys3裡面了。**
   
-<img width="450" height="209" alt="image" src="https://github.com/user-attachments/assets/25807392-5dac-44f4-b5dc-a544d9fef96c" />
+ <img width="450" height="209" alt="image" src="https://github.com/user-attachments/assets/510d4897-abda-49a5-929c-5eb7ccc0f9b9" />
+
 
 
 
