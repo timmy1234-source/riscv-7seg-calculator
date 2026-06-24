@@ -1,11 +1,11 @@
-# -RISC-V-FPGA-
+# riscv-7seg-calculator
 本專題以 FGMT_RiscV 作為系統基礎，簡單設計一個C語言程式，實現計算機與七段顯示器介面。
 
 本專題實作了一套基於 **軟硬體協同設計 (Hardware/Software Co-design)** 的輕量級計算機系統。以開源核心 `FGMT_RiscV` (RV32I) 為運算核心，全面透過 C 語言韌體進行動態 I/O 輪詢、去彈跳防呆與算術邏輯運算，並透過硬體到位址解碼優化，完美整合於 FPGA 開發板上。
 
 ---
 
-## 1. 使用開發板 (Development Board)
+## 1. 使用開發板
 
 * **核心平台**：Digilent Basys 3 FPGA 開發板
 * **核心晶片**：Xilinx Artix-7 FPGA (型號：`XC7A35T-1CPG236C`)
@@ -15,7 +15,7 @@
 
 ---
 
-## 2. 使用工具版本 (Toolchains & Software Versions)
+## 2. 使用工具版本 
 
 本專案之軟硬體整合開發環境完全採用高獨立性、免安裝的可攜式（Portable）架構建置，各工具精確版本如下：
 * **注意這些工具都必須安裝，建議打包成一個tool資料夾，後續需要設定路徑對應**
@@ -30,3 +30,23 @@
   * **xPack Windows Build Tools (Version 4.2.1-2)**：於 Windows 環境下提供 GNU `make` 輔助指令，供 Eclipse 執行自動化專案構建。
 
 ---
+## 3. 環境建置
+
+* **前面安裝完後，會有tool資料夾將工具都放裡面**
+* <img width="650" height="117" alt="image" src="https://github.com/user-attachments/assets/ef124024-b61e-48a1-9485-1a799ad7cfec" />
+
+* **接著在路徑"FGMT_RiscV-main\Software\Eclipse.bat"中我們必須修改這個檔案讓他對應到我們剛剛tool資料夾的位置**
+如下圖 將內容修改為電腦中tool資料夾各個內容的相對位置
+<img width="777" height="260" alt="image" src="https://github.com/user-attachments/assets/80b33dd5-6c67-4b78-91ba-5fbce79b97d5" />
+
+
+
+
+
+
+
+
+
+
+
+
