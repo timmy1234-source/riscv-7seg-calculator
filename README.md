@@ -58,6 +58,7 @@
 * **搭配前面的工作環境，他其實可以做到只要修改main.c他都能幫你一鍵編譯成RISC-V需要的檔案**
 * **點選左上槌子圖示就會自動編譯**
 * **Console 會顯示是否有error。以及是否編譯成功。**
+  
   <img width="507" height="360" alt="image" src="https://github.com/user-attachments/assets/634a34eb-10c7-41a6-bbea-12c697d32013" />
 
 * **點選debug圖式。將編好的檔案編進板子裡跑。**
