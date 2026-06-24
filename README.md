@@ -85,6 +85,15 @@
 * 左:用於切換加法、減法模式。按下會同步切換即顯示計算結果。
 * 右:把A、B的值歸零。
 
+---
+## 參考資料
+
+1. **開源核心與處理器架構**：BLangOS, "[FGMT_RiscV: A Lightweight RISC-V Core for FPGA Deployment](https://github.com/BLangOS/FGMT_RiscV)," *GitHub Repository*, 2023. [Accessed: Jun. 2026].
+2. **開發板硬體規格與腳位約束**：Digilent, "[Basys 3 FPGA Board Reference Manual](https://digilent.com/reference/programmable-logic/basys-3/reference-manual)," *Digilent Inc.*, Doc. Ref. 502-318, 2016.
+3. **Eclipse 整合開發環境**：The Eclipse Foundation, "[Eclipse IDE for C/C++ Developers (Version 2024-12-R)](https://www.eclipse.org/downloads/packages/release/2024-12/r)," *Eclipse Foundation*, Dec. 2024.
+4. **RISC-V 跨平台編譯器 (xPack 發行版)**：L. Ionescu (xPack Project), "[xPack RISC-V None ELF GCC (Version 12.2.0-3)](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack)," *GitHub Repository*, 2023.
+5. **Windows 原生構建工具環境**：L. Ionescu (xPack Project), "[xPack Windows Build Tools (Version 4.2.1-2)](https://github.com/xpack-dev-tools/windows-build-tools-xpack)," *GitHub Repository*, 2023.
+
   
 
 
