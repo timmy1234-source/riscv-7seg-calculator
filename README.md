@@ -30,14 +30,20 @@
   * **xPack Windows Build Tools (Version 4.2.1-2)**：於 Windows 環境下提供 GNU `make` 輔助指令，供 Eclipse 執行自動化專案構建。
 
 ---
-## 3. 環境建置
+## 3. 工作區環境建置
+* **我們透過建立這個工作區，將工具整合，便能使用 Eclipse IDE 快速且方便的編譯`main.c`
 
-* **前面安裝完後，會有tool資料夾將工具都放裡面**
+* **前面工具安裝完後，會有tool資料夾將工具都放裡面**
 * <img width="650" height="117" alt="image" src="https://github.com/user-attachments/assets/ef124024-b61e-48a1-9485-1a799ad7cfec" />
 
 * **接著在路徑"FGMT_RiscV-main\Software\Eclipse.bat"中我們必須修改這個檔案讓他對應到我們剛剛tool資料夾的位置**
 如下圖 將內容修改為電腦中tool資料夾各個內容的相對位置
-<img width="777" height="260" alt="image" src="https://github.com/user-attachments/assets/80b33dd5-6c67-4b78-91ba-5fbce79b97d5" />
+* <img width="777" height="260" alt="image" src="https://github.com/user-attachments/assets/80b33dd5-6c67-4b78-91ba-5fbce79b97d5" />
+
+* **接著點擊"Eclipse.bat"他就會自動開啟**
+* 這時要注意Eclipse的設定是否正確如下
+* [Setup_Debug_Configuration.pdf](https://github.com/user-attachments/files/29289072/Setup_Debug_Configuration.pdf)
+
 
 
 
