@@ -18,6 +18,7 @@
 ## 2. 使用工具版本 (Toolchains & Software Versions)
 
 本專案之軟硬體整合開發環境完全採用高獨立性、免安裝的可攜式（Portable）架構建置，各工具精確版本如下：
+**注意這些工具都必須安裝，建議打包成一個tool資料夾，後續需要設定路徑對應**
 
 * **硬體開發與邏輯合成工具**：
   * **Xilinx Vivado Design Suite v2020.2**：負責系統電路合成（Synthesis）、佈局繞線（Implementation）與生成硬體位元流（Bitstream）。
