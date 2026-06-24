@@ -1,6 +1,6 @@
 # riscv-7seg-calculator
 本專題以 FGMT_RiscV 作為系統基礎，簡單設計一個C語言程式，實現計算機與七段顯示器介面。
-基本上是以 FGMT_RiscV 為基礎開發，搭配他的系統能夠一鍵編譯更改後的main.c非常方便。
+基本上是以 FGMT_RiscV 為基礎開發，搭配他的系統能夠一鍵編譯更改後的main.c非常方便。我們僅需專注於設計C語言程式，就能他配他的GPIO成功實現簡單的計算機系統。
 
 本專題實作了一套基於 **軟硬體協同設計 (Hardware/Software Co-design)** 的輕量級計算機系統。以開源核心 `FGMT_RiscV` (RV32I) 為運算核心，全面透過 C 語言韌體進行動態 I/O 輪詢、去彈跳防呆與算術邏輯運算，並透過硬體到位址解碼優化，完美整合於 FPGA 開發板上。
 
@@ -57,8 +57,8 @@
 ## 5.Eclipse IDE使用。	
 * **搭配前面的工作環境，他其實可以做到只要修改main.c他都能幫你一鍵編譯成RISC-V需要的檔案**
 * **點選左上槌子圖示就會自動編譯**
+* **Console 會顯示是否有error。以及是否編譯成功。**
   <img width="507" height="360" alt="image" src="https://github.com/user-attachments/assets/634a34eb-10c7-41a6-bbea-12c697d32013" />
-Console 會顯示是否有error。以及是否編譯成功。
 
 * **點選debug圖式。將編好的檔案編進板子裡跑。**
 **開始為暫停狀態，點擊resume讓他繼續跑就好。**
